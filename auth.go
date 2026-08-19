@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -12,7 +13,7 @@ import (
 	"github.com/google/uuid"
 )
 
-var secret = []byte("yo")
+var secret = os.Getenv("JWT_SECRET")
 
 type Claims struct {
 	UserID uuid.UUID `json:"user_id"`
@@ -73,7 +74,7 @@ func AuthMiddleware(up http.HandlerFunc) http.HandlerFunc {
 }
 
 func RequireRole(role MemRole, up http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+	return AuthMiddleware(func(w http.ResponseWriter, r *http.Request) {
 		claims := getClaims(r)
 		if claims == nil {
 			writeError(w, http.StatusInternalServerError, "just rlly bad")
@@ -86,7 +87,7 @@ func RequireRole(role MemRole, up http.HandlerFunc) http.HandlerFunc {
 
 		up(w, r)
 
-	}
+	})
 }
 
 func getClaims(r *http.Request) *Claims {
