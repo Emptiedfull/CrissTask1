@@ -78,7 +78,8 @@ func main() {
 	})
 
 	fmt.Println("serving ")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	addr := ":" + getEnv("PORT", "8080")
+	log.Fatal(http.ListenAndServe(addr, mux))
 	fmt.Println("server up")
 
 }
