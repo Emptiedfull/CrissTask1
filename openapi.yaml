@@ -5,7 +5,7 @@ info:
   description: Real-time inventory tracking with JWT auth, RBAC, and WebSocket broadcasts.
 
 servers:
-  - url: http://localhost:6996
+  - url: /
 
 components:
   securitySchemes:
