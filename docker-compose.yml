@@ -1,0 +1,32 @@
+services:
+  postgres: 
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: inventory
+      POSTGRES_PASSWORD: inventory
+      POSTGRES_DB: inventory
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inventory"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    
+  api:
+    build: .
+    restart: on-failure
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://inventory:inventory@postgres:5432/inventory?sslmode=disable
+      JWT_SECRET: water-is-not-wet-lowk
+      PORT: 6996
+    ports:
+      - 6996:6996
+
+volumes:
+  pgdata:
